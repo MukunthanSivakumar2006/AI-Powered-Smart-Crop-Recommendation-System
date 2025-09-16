@@ -7,7 +7,7 @@ A **static web application** for intelligent crop recommendations based on soil 
 [![Crop Recommendation System](https://img.shields.io/badge/Live%20Demo-Available-brightgreen)](https://yourusername.github.io/crop-recommendation-system/)
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
 [![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
-[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+
 
 ## ✨ Features
 
@@ -25,14 +25,6 @@ A **static web application** for intelligent crop recommendations based on soil 
 - **Styling**: Modern CSS Grid, Flexbox, Animations
 - **Logic**: Rule-based recommendation engine
 - **Deployment**: GitHub Pages (Static hosting)
-
-## 📱 Screenshots
-
-### Desktop View
-![Desktop Screenshot](https://via.placeholder.com/800x600/4CAF50/FFFFFF?text=Desktop+View)
-
-### Mobile View
-![Mobile Screenshot](https://via.placeholder.com/300x600/4CAF50/FFFFFF?text=Mobile+View)
 
 ## 🌾 Supported Crops
 
@@ -56,7 +48,7 @@ A **static web application** for intelligent crop recommendations based on soil 
 ## 🚀 Quick Start
 
 ### Option 1: Use the Live Demo
-Simply visit: **[Your GitHub Pages URL](https://yourusername.github.io/crop-recommendation-system/)**
+Simply visit: **[Your GitHub Pages URL](https://github.com/MukunthanSivakumar2006/AI-Powered-Smart-Crop-Recommendation-System)**
 
 ### Option 2: Run Locally
 1. Clone this repository:

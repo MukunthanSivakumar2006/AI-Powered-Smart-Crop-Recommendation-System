@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌾 Crop Recommendation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .input-group {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .input-group h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .predict-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin: 30px 0;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+        }
+
+        .predict-btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            background: #e8f5e8;
+            border: 2px solid #4CAF50;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+            display: none;
+        }
+
+        .result.success {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result h3 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .crop-name {
+            font-size: 2.5rem;
+            color: #4CAF50;
+            font-weight: bold;
+            margin: 20px 0;
+            text-transform: capitalize;
+        }
+
+        .confidence {
+            background: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+
+        .crop-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .info-section {
+            margin-top: 50px;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        .info-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .crop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .crop-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .input-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .content {
+                padding: 20px 15px;
+            }
+
+            .input-group {
+                padding: 20px;
+            }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌾 Crop Recommendation System</h1>
+            <p>Smart Farming AI - Get personalized crop recommendations based on soil and climate conditions</p>
+        </div>
+
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <h2>🌱 Soil Nutrients</h2>
+
+                    <div class="form-group">
+                        <label class="tooltip">
+                            Nitrogen (N)
+                            <span class="tooltiptext">Nitrogen content in soil (0-200)</span>
+                        </label>
+                        <input type="number" id="nitrogen" min="0" max="200" value="90" placeholder="Enter N value">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="tooltip">
+                            Phosphorus (P)
+                            <span class="tooltiptext">Phosphorus content in soil (0-200)</span>
+                        </label>
+                        <input type="number" id="phosphorus" min="0" max="200" value="42" placeholder="Enter P value">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="tooltip">
+                            Potassium (K)
+                            <span class="tooltiptext">Potassium content in soil (0-200)</span>
+                        </label>
+                        <input type="number" id="potassium" min="0" max="200" value="43" placeholder="Enter K value">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="tooltip">
+                            pH Level
+                            <span class="tooltiptext">Soil pH level (0-14)</span>
+                        </label>
+                        <input type="number" id="ph" min="0" max="14" step="0.1" value="6.5" placeholder="Enter pH">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <h2>🌤️ Climate Conditions</h2>
+
+                    <div class="form-group">
+                        <label class="tooltip">
+                            Temperature (°C)
+                            <span class="tooltiptext">Average temperature (-10 to 50°C)</span>
+                        </label>
+                        <input type="number" id="temperature" min="-10" max="50" step="0.1" value="25" placeholder="Enter temperature">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="tooltip">
+                            Humidity (%)
+                            <span class="tooltiptext">Relative humidity (0-100%)</span>
+                        </label>
+                        <input type="number" id="humidity" min="0" max="100" step="0.1" value="80" placeholder="Enter humidity">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="tooltip">
+                            Rainfall (mm)
+                            <span class="tooltiptext">Average rainfall (0-500mm)</span>
+                        </label>
+                        <input type="number" id="rainfall" min="0" max="500" step="0.1" value="200" placeholder="Enter rainfall">
+                    </div>
+                </div>
+            </div>
+
+            <button class="predict-btn" onclick="predictCrop()">🔍 Get Crop Recommendation</button>
+
+            <div id="result" class="result">
+                <h3>✅ Prediction Complete!</h3>
+                <div id="cropName" class="crop-name"></div>
+                <div id="confidence" class="confidence"></div>
+                <div id="cropInfo" class="crop-info"></div>
+            </div>
+
+            <div class="info-section">
+                <h3>ℹ️ How it works</h3>
+                <p>This AI-powered system analyzes soil nutrients and climate conditions to recommend the most suitable crop for your farm:</p>
+                <br>
+                <ol>
+                    <li><strong>Input Parameters:</strong> Enter soil nutrient levels (N, P, K), pH, temperature, humidity, and rainfall</li>
+                    <li><strong>AI Analysis:</strong> Our intelligent algorithm processes your data using agricultural research</li>
+                    <li><strong>Recommendation:</strong> Get the best crop recommendation with growing tips</li>
+                </ol>
+
+                <h3 style="margin-top: 30px;">🌾 Supported Crops (22 types)</h3>
+                <div class="crop-grid">
+                    <div class="crop-item">🍚 Rice</div>
+                    <div class="crop-item">🌽 Maize</div>
+                    <div class="crop-item">🌾 Wheat</div>
+                    <div class="crop-item">🌸 Cotton</div>
+                    <div class="crop-item">🍌 Banana</div>
+                    <div class="crop-item">🍎 Apple</div>
+                    <div class="crop-item">🍇 Grapes</div>
+                    <div class="crop-item">🍊 Orange</div>
+                    <div class="crop-item">🫛 Chickpea</div>
+                    <div class="crop-item">🫘 Kidney Beans</div>
+                    <div class="crop-item">🥥 Coconut</div>
+                    <div class="crop-item">🥭 Papaya</div>
+                    <div class="crop-item">🍉 Watermelon</div>
+                    <div class="crop-item">🍈 Muskmelon</div>
+                    <div class="crop-item">☕ Coffee</div>
+                    <div class="crop-item">🌿 Jute</div>
+                    <div class="crop-item">🫘 Lentil</div>
+                    <div class="crop-item">🫘 Black Gram</div>
+                    <div class="crop-item">🫘 Moth Beans</div>
+                    <div class="crop-item">🫛 Mung Bean</div>
+                    <div class="crop-item">🫛 Pigeon Peas</div>
+                    <div class="crop-item">🍎 Pomegranate</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Crop recommendation data and rules
+        const cropData = {
+            'rice': {
+                ranges: {
+                    N: [60, 100], P: [35, 60], K: [35, 45],
+                    temperature: [20, 27], humidity: [80, 85], ph: [5, 8], rainfall: [150, 300]
+                },
+                info: "🍚 Rice thrives in warm, humid conditions with high rainfall. Ideal for wet climates and flooded fields.",
+                emoji: "🍚"
+            },
+            'maize': {
+                ranges: {
+                    N: [60, 100], P: [35, 60], K: [15, 25],
+                    temperature: [18, 27], humidity: [55, 75], ph: [5.5, 7], rainfall: [60, 110]
+                },
+                info: "🌽 Maize grows well in moderate temperatures with adequate rainfall. Good for temperate regions.",
+                emoji: "🌽"
+            },
+            'wheat': {
+                ranges: {
+                    N: [70, 120], P: [40, 80], K: [30, 50],
+                    temperature: [15, 25], humidity: [60, 80], ph: [6, 7.5], rainfall: [150, 250]
+                },
+                info: "🌾 Wheat prefers cooler temperatures and moderate rainfall. Ideal for temperate climates.",
+                emoji: "🌾"
+            },
+            'chickpea': {
+                ranges: {
+                    N: [20, 60], P: [55, 80], K: [75, 85],
+                    temperature: [17, 21], humidity: [14, 20], ph: [6, 9], rainfall: [65, 95]
+                },
+                info: "🫛 Chickpea grows well in cool, dry conditions. Ideal for arid and semi-arid regions.",
+                emoji: "🫛"
+            },
+            'kidneybeans': {
+                ranges: {
+                    N: [0, 40], P: [55, 80], K: [15, 25],
+                    temperature: [15, 25], humidity: [18, 25], ph: [5.5, 6], rainfall: [60, 150]
+                },
+                info: "🫘 Kidney beans prefer moderate temperatures and consistent moisture. Good for temperate climates.",
+                emoji: "🫘"
+            },
+            'banana': {
+                ranges: {
+                    N: [80, 120], P: [70, 95], K: [45, 55],
+                    temperature: [25, 30], humidity: [75, 85], ph: [5.5, 7], rainfall: [90, 120]
+                },
+                info: "🍌 Banana needs warm, humid conditions with consistent moisture. Perfect for tropical areas.",
+                emoji: "🍌"
+            },
+            'apple': {
+                ranges: {
+                    N: [0, 40], P: [120, 145], K: [195, 205],
+                    temperature: [21, 24], humidity: [90, 95], ph: [5.5, 7], rainfall: [100, 125]
+                },
+                info: "🍎 Apple trees prefer cooler climates with adequate rainfall. Ideal for temperate regions.",
+                emoji: "🍎"
+            },
+            'grapes': {
+                ranges: {
+                    N: [0, 40], P: [120, 145], K: [195, 205],
+                    temperature: [8, 42], humidity: [80, 85], ph: [5.5, 7], rainfall: [65, 75]
+                },
+                info: "🍇 Grapes thrive in warm, dry climates with moderate rainfall. Perfect for Mediterranean conditions.",
+                emoji: "🍇"
+            },
+            'orange': {
+                ranges: {
+                    N: [0, 40], P: [5, 30], K: [5, 15],
+                    temperature: [10, 35], humidity: [90, 95], ph: [6, 8], rainfall: [100, 120]
+                },
+                info: "🍊 Orange trees need warm temperatures and adequate water. Suitable for subtropical regions.",
+                emoji: "🍊"
+            },
+            'cotton': {
+                ranges: {
+                    N: [100, 140], P: [35, 60], K: [15, 25],
+                    temperature: [22, 26], humidity: [75, 85], ph: [5.5, 8], rainfall: [60, 100]
+                },
+                info: "🌸 Cotton requires warm temperatures and moderate rainfall. Suitable for semi-arid regions.",
+                emoji: "🌸"
+            },
+            'coconut': {
+                ranges: {
+                    N: [0, 40], P: [5, 30], K: [25, 35],
+                    temperature: [25, 30], humidity: [90, 100], ph: [5.5, 8], rainfall: [130, 225]
+                },
+                info: "🥥 Coconut palms need warm, humid tropical conditions with high rainfall.",
+                emoji: "🥥"
+            },
+            'papaya': {
+                ranges: {
+                    N: [30, 70], P: [45, 70], K: [45, 55],
+                    temperature: [23, 44], humidity: [90, 95], ph: [6.5, 7.5], rainfall: [40, 250]
+                },
+                info: "🥭 Papaya requires warm temperatures and adequate moisture. Suitable for tropical regions.",
+                emoji: "🥭"
+            },
+            'watermelon': {
+                ranges: {
+                    N: [80, 120], P: [5, 30], K: [45, 55],
+                    temperature: [24, 27], humidity: [80, 90], ph: [6, 7.5], rainfall: [40, 60]
+                },
+                info: "🍉 Watermelon needs warm temperatures and moderate water. Great for summer cultivation.",
+                emoji: "🍉"
+            },
+            'muskmelon': {
+                ranges: {
+                    N: [80, 120], P: [5, 30], K: [45, 55],
+                    temperature: [27, 30], humidity: [90, 95], ph: [6, 7.5], rainfall: [20, 30]
+                },
+                info: "🍈 Muskmelon thrives in warm, dry conditions. Perfect for summer in arid regions.",
+                emoji: "🍈"
+            },
+            'coffee': {
+                ranges: {
+                    N: [80, 120], P: [15, 40], K: [25, 35],
+                    temperature: [23, 28], humidity: [50, 70], ph: [6, 8], rainfall: [115, 200]
+                },
+                info: "☕ Coffee plants prefer mild temperatures with adequate rainfall in tropical highlands.",
+                emoji: "☕"
+            }
+        };
+
+        function calculateScore(inputValues, cropRanges) {
+            let score = 0;
+            let totalWeight = 0;
+
+            // Weights for different parameters (higher = more important)
+            const weights = {
+                temperature: 3,
+                humidity: 2.5,
+                rainfall: 3,
+                ph: 2,
+                N: 2,
+                P: 2,
+                K: 2
+            };
+
+            for (const param in cropRanges) {
+                const value = inputValues[param];
+                const [min, max] = cropRanges[param];
+                const weight = weights[param] || 1;
+
+                if (value >= min && value <= max) {
+                    // Perfect match
+                    score += 100 * weight;
+                } else {
+                    // Calculate distance from ideal range
+                    let distance;
+                    if (value < min) {
+                        distance = (min - value) / min;
+                    } else {
+                        distance = (value - max) / max;
+                    }
+
+                    // Convert distance to score (max penalty of 50%)
+                    const penalty = Math.min(distance * 50, 50);
+                    score += (100 - penalty) * weight;
+                }
+
+                totalWeight += weight;
+            }
+
+            return score / totalWeight;
+        }
+
+        function predictCrop() {
+            // Get input values
+            const inputValues = {
+                N: parseFloat(document.getElementById('nitrogen').value) || 0,
+                P: parseFloat(document.getElementById('phosphorus').value) || 0,
+                K: parseFloat(document.getElementById('potassium').value) || 0,
+                temperature: parseFloat(document.getElementById('temperature').value) || 0,
+                humidity: parseFloat(document.getElementById('humidity').value) || 0,
+                ph: parseFloat(document.getElementById('ph').value) || 0,
+                rainfall: parseFloat(document.getElementById('rainfall').value) || 0
+            };
+
+            // Calculate scores for all crops
+            let bestCrop = null;
+            let bestScore = 0;
+
+            for (const cropName in cropData) {
+                const score = calculateScore(inputValues, cropData[cropName].ranges);
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestCrop = cropName;
+                }
+            }
+
+            // Display result
+            if (bestCrop) {
+                const cropInfo = cropData[bestCrop];
+                document.getElementById('cropName').textContent = `${cropInfo.emoji} ${bestCrop.charAt(0).toUpperCase() + bestCrop.slice(1)}`;
+                document.getElementById('confidence').textContent = `Confidence: ${bestScore.toFixed(1)}%`;
+                document.getElementById('cropInfo').textContent = cropInfo.info;
+                document.getElementById('result').className = 'result success';
+
+                // Scroll to result
+                document.getElementById('result').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        }
+
+        // Add input validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    const min = parseFloat(this.min);
+                    const max = parseFloat(this.max);
+                    const value = parseFloat(this.value);
+
+                    if (value < min) this.value = min;
+                    if (value > max) this.value = max;
+                });
+            });
+
+            // Add Enter key support
+            inputs.forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        predictCrop();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

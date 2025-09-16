@@ -2,7 +2,7 @@
 
 A **static web application** for intelligent crop recommendations based on soil nutrients and climate conditions. This version runs entirely in the browser using JavaScript and can be hosted on **GitHub Pages**.
 
-## 🚀 [**Live Demo**](https://yourusername.github.io/crop-recommendation-system/)
+## 🚀 [**Live Demo**](https://github.com/MukunthanSivakumar2006/AI-Powered-Smart-Crop-Recommendation-System)
 
 [![Crop Recommendation System](https://img.shields.io/badge/Live%20Demo-Available-brightgreen)](https://yourusername.github.io/crop-recommendation-system/)
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
